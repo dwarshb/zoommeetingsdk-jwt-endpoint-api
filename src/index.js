@@ -16,7 +16,7 @@ const propValidations = {
   expirationSeconds: isBetween(1800, 172800)
 }
 
-const schemaValidations = [isRequiredAllOrNone(['videoSDKKey', 'videoSDKSecret', 'meetingNumber', 'role'])]
+const schemaValidations = [isRequiredAllOrNone(['meetingNumber', 'role'])]
 
 const coerceRequestBody = (body) => ({
   ...body,
@@ -34,14 +34,14 @@ app.post('/', (req, res) => {
     return res.status(400).json({ errors: validationErrors })
   }
 
-  const { videoSDKKey, videoSDKSecret, meetingNumber, role, expirationSeconds } = requestBody
+  const { meetingNumber, role, expirationSeconds } = requestBody
   const iat = Math.floor(Date.now() / 1000)
   const exp = expirationSeconds ? iat + expirationSeconds : iat + 60 * 60 * 2
   const oHeader = { alg: 'HS256', typ: 'JWT' }
 
   const oPayload = {
-    appKey: videoSDKKey,
-    sdkKey: videoSDKSecret,
+    appKey: process.env.ZOOM_MEETING_SDK_KEY,
+    sdkKey: process.env.ZOOM_MEETING_SDK_SECRET,
     mn: meetingNumber,
     role,
     iat,
